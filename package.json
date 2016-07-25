@@ -1,0 +1,10 @@
+{
+  "name": "integration-bing-ads",
+  "description": "mParticle integration sdk for Bing Ads",
+  "repository": "https://github.com/mParticle/integration-bingads",
+  "devDependencies": {
+    "blanket": "1.1.7",
+    "should": "7.1.0",
+    "mocha": "2.3.2"
+  }
+}
