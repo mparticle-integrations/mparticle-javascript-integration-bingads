@@ -13,7 +13,7 @@
 //  limitations under the License.
 
 (function (window) {
-    var name = 'BingAdsEventForwarder',
+    var name = 'Bing',
         MessageType = {
             SessionStart: 1,
             SessionEnd: 2,
@@ -41,7 +41,7 @@
         var self = this,
             isInitialized = false,
             forwarderSettings = null,
-            reportingService  = null;
+            reportingService = null;
 
         self.name = name;
 
@@ -158,7 +158,7 @@
         }
 
         function createUetObject (event, action) {
-            var obj =  {
+            var obj = {
                 ea: action,
                 ec: window.mParticle.EventType.getName(event.EventCategory),
                 el: event.EventName
@@ -179,7 +179,7 @@
         !window.mParticle ||
         !window.mParticle.addForwarder) {
 
-            return;
+        return;
     }
 
     window.mParticle.addForwarder({
