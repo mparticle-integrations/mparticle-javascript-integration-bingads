@@ -14,6 +14,7 @@
 
 (function (window) {
     var name = 'Bing',
+        moduleId = 107,
         MessageType = {
             SessionStart: 1,
             SessionEnd: 2,
@@ -23,18 +24,6 @@
             OptOut: 6,
             Profile: 14,
             Commerce: 16
-        },
-        EventType = {
-            Unknown: 0,
-            Navigation: 1,
-            Location: 2,
-            Search: 3,
-            Transaction: 4,
-            UserContent: 5,
-            UserPreference: 6,
-            Social: 7,
-            Other: 8,
-            Media: 9
         };
 
     var constructor = function () {
@@ -175,6 +164,18 @@
         this.process = processEvent;
     };
 
+    function getId() {
+        return moduleId;
+    }
+
+    function register(config) {
+        if (config.kits) {
+            config.kits[name] = {
+                constructor: constructor
+            };
+        }
+    }
+
     if (!window ||
         !window.mParticle ||
         !window.mParticle.addForwarder) {
@@ -184,7 +185,11 @@
 
     window.mParticle.addForwarder({
         name: name,
-        constructor: constructor
+        constructor: constructor,
+        getId: getId
     });
 
+    module.exports = {
+        register: register
+    };
 })(window);
