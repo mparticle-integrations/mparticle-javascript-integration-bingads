@@ -1,5 +1,5 @@
 {
-  "name": "@mparticle/web-bingads-kit",
+  "name": "@mparticle/web-bing-ads-kit",
   "version": "2.0.0-rc.1",
   "author": "mParticle Developers <developers@mparticle.com> (https://www.mparticle.com)",
   "description": "mParticle integration sdk for Bing Ads",
