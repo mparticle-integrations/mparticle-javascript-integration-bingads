@@ -1,0 +1,214 @@
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(global = global || self, factory(global['mp-bingAds-kit'] = {}));
+}(this, function (exports) {
+	function createCommonjsModule(fn, module) {
+		return module = { exports: {} }, fn(module, module.exports), module.exports;
+	}
+
+	var BingAdsEventForwarder = createCommonjsModule(function (module) {
+	//  Copyright 2016 mParticle, Inc.
+	//
+	//  Licensed under the Apache License, Version 2.0 (the "License");
+	//  you may not use this file except in compliance with the License.
+	//  You may obtain a copy of the License at
+	//
+	//      http://www.apache.org/licenses/LICENSE-2.0
+	//
+	//  Unless required by applicable law or agreed to in writing, software
+	//  distributed under the License is distributed on an "AS IS" BASIS,
+	//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	//  See the License for the specific language governing permissions and
+	//  limitations under the License.
+
+	(function (window) {
+	    var name = 'Bing',
+	        moduleId = 107,
+	        MessageType = {
+	            SessionStart: 1,
+	            SessionEnd: 2,
+	            PageView: 3,
+	            PageEvent: 4,
+	            CrashReport: 5,
+	            OptOut: 6,
+	            Profile: 14,
+	            Commerce: 16
+	        };
+
+	    var constructor = function () {
+	        var self = this,
+	            isInitialized = false,
+	            forwarderSettings = null,
+	            reportingService = null;
+
+	        self.name = name;
+
+	        function initForwarder(settings, service, testMode) {
+	            forwarderSettings = settings;
+	            reportingService = service;
+
+	            try {
+
+	                if(!testMode) {
+	                    (function(window, document, tag, url, queue) {
+	                        var f, n, i;
+	                        window[queue] = window[queue] || [],
+	                        window.uetq = window.uetq || [],
+	                        f = function() {
+	                            var obj = {
+	                                ti: forwarderSettings.tagId,
+	                                q: window.uetq
+	                            };
+	                            obj.q = window[queue], window[queue] = new UET(obj), window[queue].push('pageLoad');
+	                        },
+	                        n = document.createElement(tag), n.src = url, n.async = 1, n.onload = n.onreadystatechange = function() {
+	                            var state = this.readyState;
+	                            state && state !== 'loaded' && state !== 'complete' || (f(), n.onload = n.onreadystatechange = null);
+	                        },
+	                        i = document.getElementsByTagName(tag)[0], i.parentNode.insertBefore(n, i);
+	                    })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
+
+	                    if (window.uetq && window.queue && window.queue.length > 0) {
+	                        for (var i = 0, length = window.queue.length; i < length; i++) {
+	                            processEvent(window.queue[i]);
+	                        }
+
+	                        window.queue.length = 0;
+	                    }
+	                }
+
+	                isInitialized = true;
+	                return 'Successfully initialized: ' + name;
+	            }
+	            catch (e) {
+	                return 'Can\'t initialize forwarder: ' + name + ': ' + e;
+	            }
+	        }
+
+	        function processEvent(event) {
+	            if (!isInitialized) {
+	                return 'Can\'t send to forwarder: ' + name + ', not initialized';
+	            }
+
+	            var reportEvent = false;
+	            try {
+	                if (event.EventDataType == MessageType.PageEvent ||
+	                    event.EventDataType == MessageType.PageView) {
+
+	                    reportEvent = true;
+	                    logEvent(event);
+	                }
+	                else if (event.EventDataType == MessageType.Commerce &&
+	                    event.ProductAction &&
+	                    event.ProductAction.ProductActionType == mParticle.ProductActionType.Purchase) {
+
+	                    reportEvent = true;
+	                    logPurchaseEvent(event);
+	                }
+
+	                if(reportEvent && reportingService) {
+	                    reportingService(self, event);
+	                    return 'Successfully sent to forwarder: ' + name;
+	                }
+
+	            }
+	            catch (e) {
+	                return 'Can\'t send to forwarder: ' + name + ' ' + e;
+	            }
+	        }
+
+	        function logEvent(event) {
+	            if (!isInitialized) {
+	                return 'Can\'t log event on forwarder: ' + name + ', not initialized';
+	            }
+
+	            try {
+	                var obj = createUetObject(event, 'pageLoad');
+
+	                window.uetq.push(obj);
+	            }
+	            catch (e) {
+	                return 'Can\'t log event on forwarder: ' + name + ': ' + e;
+	            }
+
+	            return 'Successfully logged event from forwarder: ' + name;
+	        }
+
+	        function logPurchaseEvent(event) {
+	            if (!isInitialized) {
+	                return 'Can\'t log purchase event on forwarder: ' + name + ', not initialized';
+	            }
+
+	            if (event.ProductAction.TotalAmount === undefined ||
+	                event.ProductAction.TotalAmount === null) {
+	                return 'Can\'t log purchase event without a total amount on product action';
+	            }
+
+	            try {
+	                var obj = createUetObject(event, 'eCommerce');
+	                obj.gv = event.ProductAction.TotalAmount;
+
+	                window.uetq.push(obj);
+	            }
+	            catch (e) {
+	                return 'Can\'t log commerce event on forwarder: ' + name + ': ' + e;
+	            }
+	        }
+
+	        function createUetObject (event, action) {
+	            var obj = {
+	                ea: action,
+	                ec: window.mParticle.EventType.getName(event.EventCategory),
+	                el: event.EventName
+	            };
+
+	            if (event.CustomFlags && event.CustomFlags['Bing.EventValue']) {
+	                obj.ev = event.CustomFlags['Bing.EventValue'];
+	            }
+
+	            return obj;
+	        }
+
+	        this.init = initForwarder;
+	        this.process = processEvent;
+	    };
+
+	    function getId() {
+	        return moduleId;
+	    }
+
+	    function register(config) {
+	        if (config.kits) {
+	            config.kits[name] = {
+	                constructor: constructor
+	            };
+	        }
+	    }
+
+	    if (!window ||
+	        !window.mParticle ||
+	        !window.mParticle.addForwarder) {
+
+	        return;
+	    }
+
+	    window.mParticle.addForwarder({
+	        name: name,
+	        constructor: constructor,
+	        getId: getId
+	    });
+
+	    module.exports = {
+	        register: register
+	    };
+	})(window);
+	});
+	var BingAdsEventForwarder_1 = BingAdsEventForwarder.register;
+
+	exports.default = BingAdsEventForwarder;
+	exports.register = BingAdsEventForwarder_1;
+
+	Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
