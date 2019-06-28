@@ -1,3 +1,15 @@
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var toString = {}.toString;
+
+var isarray = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+var isobject = function isObject(val) {
+  return val != null && typeof val === 'object' && isarray(val) === false;
+};
+
 //  Copyright 2016 mParticle, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +24,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-    var isobject = require('isobject');
+    
 
     var name = 'Bing',
         moduleId = 107,
@@ -201,6 +213,10 @@
         });
     }
 
-    module.exports = {
+    var BingAdsEventForwarder = {
         register: register
     };
+var BingAdsEventForwarder_1 = BingAdsEventForwarder.register;
+
+exports.default = BingAdsEventForwarder;
+exports.register = BingAdsEventForwarder_1;
