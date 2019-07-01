@@ -1,3 +1,16 @@
+Object.defineProperty(exports, '__esModule', { value: true });
+
+/*!
+ * isobject <https://github.com/jonschlinkert/isobject>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(val) {
+  return val != null && typeof val === 'object' && Array.isArray(val) === false;
+}
+
 //  Copyright 2016 mParticle, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +25,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-    var isobject = require('isobject');
+    
 
     var name = 'Bing',
         moduleId = 107,
@@ -175,12 +188,12 @@
             return;
         }
 
-        if (!isobject(config)) {
+        if (!isObject(config)) {
             window.console.log('\'config\' must be an object. You passed in a ' + typeof config);
             return;
         }
 
-        if (isobject(config.kits)) {
+        if (isObject(config.kits)) {
             config.kits[name] = {
                 constructor: constructor
             };
@@ -201,6 +214,10 @@
         });
     }
 
-    module.exports = {
+    var BingAdsEventForwarder = {
         register: register
     };
+var BingAdsEventForwarder_1 = BingAdsEventForwarder.register;
+
+exports.default = BingAdsEventForwarder;
+exports.register = BingAdsEventForwarder_1;
