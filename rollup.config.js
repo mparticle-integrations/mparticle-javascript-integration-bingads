@@ -21,7 +21,7 @@ export default [
     {
         input: 'src/BingAdsEventForwarder',
         output: {
-            file: 'dist/BingAdsEventForwarder.js',
+            file: 'dist/BingAdsEventForwarder.iife.js',
             format: 'iife',
             exports: 'named',
             name: 'mpBingAdsKit',
@@ -37,7 +37,7 @@ export default [
     {
         input: 'src/BingAdsEventForwarder',
         output: {
-            file: 'npm/BingAdsEventForwarder.js',
+            file: 'dist/BingAdsEventForwarder.common.js',
             format: 'cjs',
             exports: 'named',
             name: 'mpBingAdsKit',
