@@ -5,22 +5,6 @@ export default [
     {
         input: 'src/BingAdsEventForwarder',
         output: {
-            file: 'BingAdsEventForwarder.js',
-            format: 'iife',
-            exports: 'named',
-            name: 'mpBingAdsKit',
-            strict: false
-        },
-        plugins: [
-            resolve({
-                browser: true
-            }),
-            commonjs()
-        ]
-    },
-    {
-        input: 'src/BingAdsEventForwarder',
-        output: {
             file: 'dist/BingAdsEventForwarder.iife.js',
             format: 'iife',
             exports: 'named',
