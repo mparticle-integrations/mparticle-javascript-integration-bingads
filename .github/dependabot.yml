@@ -1,0 +1,14 @@
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: '/'
+      schedule:
+          interval: weekly
+          day: 'sunday'
+      target-branch: 'chore/dependabot'
+      labels: ['dependabot', 'dependencies']
+      open-pull-requests-limit: 10
+      commit-message:
+          prefix: 'chore'
+      allow:
+          - dependency-type: 'production'
