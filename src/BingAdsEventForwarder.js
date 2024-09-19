@@ -12,199 +12,207 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-    var isobject = require('isobject');
+var isobject = require("isobject");
 
-    var name = 'Bing',
-        moduleId = 107,
-        MessageType = {
-            SessionStart: 1,
-            SessionEnd: 2,
-            PageView: 3,
-            PageEvent: 4,
-            CrashReport: 5,
-            OptOut: 6,
-            Profile: 14,
-            Commerce: 16
-        };
+var name = "Bing",
+  moduleId = 107,
+  MessageType = {
+    SessionStart: 1,
+    SessionEnd: 2,
+    PageView: 3,
+    PageEvent: 4,
+    CrashReport: 5,
+    OptOut: 6,
+    Profile: 14,
+    Commerce: 16,
+  };
 
-    var constructor = function () {
-        var self = this,
-            isInitialized = false,
-            forwarderSettings = null,
-            reportingService = null;
+var constructor = function () {
+  var self = this,
+    isInitialized = false,
+    forwarderSettings = null,
+    reportingService = null;
 
-        self.name = name;
+  self.name = name;
 
-        function initForwarder(settings, service, testMode) {
-            console.warn('BING BANG BOOM');
+  function initForwarder(settings, service, testMode) {
+    forwarderSettings = settings;
+    reportingService = service;
 
-            forwarderSettings = settings;
-            reportingService = service;
+    try {
+      if (!testMode) {
+        (function (window, document, tag, url, queue) {
+          var f, n, i;
+          (window[queue] = window[queue] || []),
+            (window.uetq = window.uetq || []),
+            (f = function () {
+              var obj = {
+                ti: forwarderSettings.tagId,
+                q: window.uetq,
+              };
+              (obj.q = window[queue]),
+                (window[queue] = new UET(obj)),
+                window[queue].push("pageLoad");
+            }),
+            (n = document.createElement(tag)),
+            (n.src = url),
+            (n.async = 1),
+            (n.onload = n.onreadystatechange =
+              function () {
+                var state = this.readyState;
+                (state && state !== "loaded" && state !== "complete") ||
+                  (f(), (n.onload = n.onreadystatechange = null));
+              }),
+            (i = document.getElementsByTagName(tag)[0]),
+            i.parentNode.insertBefore(n, i);
+        })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
 
-            try {
+        if (window.uetq && window.queue && window.queue.length > 0) {
+          for (var i = 0, length = window.queue.length; i < length; i++) {
+            processEvent(window.queue[i]);
+          }
 
-                if(!testMode) {
-                    (function(window, document, tag, url, queue) {
-                        var f, n, i;
-                        window[queue] = window[queue] || [],
-                        window.uetq = window.uetq || [],
-                        f = function() {
-                            var obj = {
-                                ti: forwarderSettings.tagId,
-                                q: window.uetq
-                            };
-                            obj.q = window[queue], window[queue] = new UET(obj), window[queue].push('pageLoad');
-                        },
-                        n = document.createElement(tag), n.src = url, n.async = 1, n.onload = n.onreadystatechange = function() {
-                            var state = this.readyState;
-                            state && state !== 'loaded' && state !== 'complete' || (f(), n.onload = n.onreadystatechange = null);
-                        },
-                        i = document.getElementsByTagName(tag)[0], i.parentNode.insertBefore(n, i);
-                    })(window, document, 'script', '//bat.bing.com/bat.js', 'uetq');
-
-                    if (window.uetq && window.queue && window.queue.length > 0) {
-                        for (var i = 0, length = window.queue.length; i < length; i++) {
-                            processEvent(window.queue[i]);
-                        }
-
-                        window.queue.length = 0;
-                    }
-                }
-
-                isInitialized = true;
-                return 'Successfully initialized: ' + name;
-            }
-            catch (e) {
-                return 'Can\'t initialize forwarder: ' + name + ': ' + e;
-            }
+          window.queue.length = 0;
         }
+      }
 
-        function processEvent(event) {
-            if (!isInitialized) {
-                return 'Can\'t send to forwarder: ' + name + ', not initialized';
-            }
+      isInitialized = true;
+      return "Successfully initialized: " + name;
+    } catch (e) {
+      return "Can't initialize forwarder: " + name + ": " + e;
+    }
+  }
 
-            var reportEvent = false;
-            try {
-                if (event.EventDataType == MessageType.PageEvent ||
-                    event.EventDataType == MessageType.PageView) {
+  function processEvent(event) {
+    if (!isInitialized) {
+      return "Can't send to forwarder: " + name + ", not initialized";
+    }
 
-                    reportEvent = true;
-                    logEvent(event);
-                }
-                else if (event.EventDataType == MessageType.Commerce &&
-                    event.ProductAction &&
-                    event.ProductAction.ProductActionType == mParticle.ProductActionType.Purchase) {
+    var reportEvent = false;
+    try {
+      if (
+        event.EventDataType == MessageType.PageEvent ||
+        event.EventDataType == MessageType.PageView
+      ) {
+        reportEvent = true;
+        logEvent(event);
+      } else if (
+        event.EventDataType == MessageType.Commerce &&
+        event.ProductAction &&
+        event.ProductAction.ProductActionType ==
+          mParticle.ProductActionType.Purchase
+      ) {
+        reportEvent = true;
+        logPurchaseEvent(event);
+      }
 
-                    reportEvent = true;
-                    logPurchaseEvent(event);
-                }
+      if (reportEvent && reportingService) {
+        reportingService(self, event);
+        return "Successfully sent to forwarder: " + name;
+      }
+    } catch (e) {
+      return "Can't send to forwarder: " + name + " " + e;
+    }
+  }
 
-                if(reportEvent && reportingService) {
-                    reportingService(self, event);
-                    return 'Successfully sent to forwarder: ' + name;
-                }
+  function logEvent(event) {
+    if (!isInitialized) {
+      return "Can't log event on forwarder: " + name + ", not initialized";
+    }
 
-            }
-            catch (e) {
-                return 'Can\'t send to forwarder: ' + name + ' ' + e;
-            }
-        }
+    try {
+      var obj = createUetObject(event, "pageLoad");
 
-        function logEvent(event) {
-            if (!isInitialized) {
-                return 'Can\'t log event on forwarder: ' + name + ', not initialized';
-            }
+      window.uetq.push(obj);
+    } catch (e) {
+      return "Can't log event on forwarder: " + name + ": " + e;
+    }
 
-            try {
-                var obj = createUetObject(event, 'pageLoad');
+    return "Successfully logged event from forwarder: " + name;
+  }
 
-                window.uetq.push(obj);
-            }
-            catch (e) {
-                return 'Can\'t log event on forwarder: ' + name + ': ' + e;
-            }
+  function logPurchaseEvent(event) {
+    if (!isInitialized) {
+      return (
+        "Can't log purchase event on forwarder: " + name + ", not initialized"
+      );
+    }
 
-            return 'Successfully logged event from forwarder: ' + name;
-        }
+    if (
+      event.ProductAction.TotalAmount === undefined ||
+      event.ProductAction.TotalAmount === null
+    ) {
+      return "Can't log purchase event without a total amount on product action";
+    }
 
-        function logPurchaseEvent(event) {
-            if (!isInitialized) {
-                return 'Can\'t log purchase event on forwarder: ' + name + ', not initialized';
-            }
+    try {
+      var obj = createUetObject(event, "eCommerce");
+      obj.gv = event.ProductAction.TotalAmount;
 
-            if (event.ProductAction.TotalAmount === undefined ||
-                event.ProductAction.TotalAmount === null) {
-                return 'Can\'t log purchase event without a total amount on product action';
-            }
+      window.uetq.push(obj);
+    } catch (e) {
+      return "Can't log commerce event on forwarder: " + name + ": " + e;
+    }
+  }
 
-            try {
-                var obj = createUetObject(event, 'eCommerce');
-                obj.gv = event.ProductAction.TotalAmount;
-
-                window.uetq.push(obj);
-            }
-            catch (e) {
-                return 'Can\'t log commerce event on forwarder: ' + name + ': ' + e;
-            }
-        }
-
-        function createUetObject (event, action) {
-            var obj = {
-                ea: action,
-                ec: window.mParticle.EventType.getName(event.EventCategory),
-                el: event.EventName
-            };
-
-            if (event.CustomFlags && event.CustomFlags['Bing.EventValue']) {
-                obj.ev = event.CustomFlags['Bing.EventValue'];
-            }
-
-            return obj;
-        }
-
-        this.init = initForwarder;
-        this.process = processEvent;
+  function createUetObject(event, action) {
+    var obj = {
+      ea: action,
+      ec: window.mParticle.EventType.getName(event.EventCategory),
+      el: event.EventName,
     };
 
-    function getId() {
-        return moduleId;
+    if (event.CustomFlags && event.CustomFlags["Bing.EventValue"]) {
+      obj.ev = event.CustomFlags["Bing.EventValue"];
     }
 
-    function register(config) {
-        if (!config) {
-            console.log('You must pass a config object to register the kit ' + name);
-            return;
-        }
+    return obj;
+  }
 
-        if (!isobject(config)) {
-            console.log('\'config\' must be an object. You passed in a ' + typeof config);
-            return;
-        }
+  this.init = initForwarder;
+  this.process = processEvent;
+};
 
-        if (isobject(config.kits)) {
-            config.kits[name] = {
-                constructor: constructor
-            };
-        } else {
-            config.kits = {};
-            config.kits[name] = {
-                constructor: constructor
-            };
-        }
-        console.log('Successfully registered ' + name + ' to your mParticle configuration');
-    }
+function getId() {
+  return moduleId;
+}
 
-    if (typeof window !== 'undefined') {
-        if (window && window.mParticle && window.mParticle.addForwarder) {
-            window.mParticle.addForwarder({
-                name: name,
-                constructor: constructor,
-                getId: getId
-            });
-        }
-    }
+function register(config) {
+  if (!config) {
+    console.log("You must pass a config object to register the kit " + name);
+    return;
+  }
 
-    module.exports = {
-        register: register
+  if (!isobject(config)) {
+    console.log("'config' must be an object. You passed in a " + typeof config);
+    return;
+  }
+
+  if (isobject(config.kits)) {
+    config.kits[name] = {
+      constructor: constructor,
     };
+  } else {
+    config.kits = {};
+    config.kits[name] = {
+      constructor: constructor,
+    };
+  }
+  console.log(
+    "Successfully registered " + name + " to your mParticle configuration"
+  );
+}
+
+if (typeof window !== "undefined") {
+  if (window && window.mParticle && window.mParticle.addForwarder) {
+    window.mParticle.addForwarder({
+      name: name,
+      constructor: constructor,
+      getId: getId,
+    });
+  }
+}
+
+module.exports = {
+  register: register,
+};
