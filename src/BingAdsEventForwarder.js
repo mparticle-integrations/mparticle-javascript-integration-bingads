@@ -36,6 +36,8 @@
         self.name = name;
 
         function initForwarder(settings, service, testMode) {
+            console.warn('BING BANG BOOM');
+
             forwarderSettings = settings;
             reportingService = service;
 

@@ -11,6 +11,16 @@ function isObject(val) {
   return val != null && typeof val === 'object' && Array.isArray(val) === false;
 }
 
+var isobject = /*#__PURE__*/Object.freeze({
+  'default': isObject
+});
+
+function getCjsExportFromNamespace (n) {
+	return n && n['default'] || n;
+}
+
+var isobject$1 = getCjsExportFromNamespace(isobject);
+
 //  Copyright 2016 mParticle, Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +59,8 @@ function isObject(val) {
         self.name = name;
 
         function initForwarder(settings, service, testMode) {
+            console.warn('BING BANG BOOM');
+
             forwarderSettings = settings;
             reportingService = service;
 
@@ -184,16 +196,16 @@ function isObject(val) {
 
     function register(config) {
         if (!config) {
-            window.console.log('You must pass a config object to register the kit ' + name);
+            console.log('You must pass a config object to register the kit ' + name);
             return;
         }
 
-        if (!isObject(config)) {
-            window.console.log('\'config\' must be an object. You passed in a ' + typeof config);
+        if (!isobject$1(config)) {
+            console.log('\'config\' must be an object. You passed in a ' + typeof config);
             return;
         }
 
-        if (isObject(config.kits)) {
+        if (isobject$1(config.kits)) {
             config.kits[name] = {
                 constructor: constructor
             };
@@ -203,15 +215,17 @@ function isObject(val) {
                 constructor: constructor
             };
         }
-        window.console.log('Successfully registered ' + name + ' to your mParticle configuration');
+        console.log('Successfully registered ' + name + ' to your mParticle configuration');
     }
 
-    if (window && window.mParticle && window.mParticle.addForwarder) {
-        window.mParticle.addForwarder({
-            name: name,
-            constructor: constructor,
-            getId: getId
-        });
+    if (typeof window !== 'undefined') {
+        if (window && window.mParticle && window.mParticle.addForwarder) {
+            window.mParticle.addForwarder({
+                name: name,
+                constructor: constructor,
+                getId: getId
+            });
+        }
     }
 
     var BingAdsEventForwarder = {

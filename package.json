@@ -10,12 +10,22 @@
     ],
     "repository": "https://github.com/mparticle-integrations/mparticle-javascript-integration-bingads",
     "scripts": {
-        "build": "rollup --config rollup.config.js",
-        "watch": "rollup --config rollup.config.js -w",
-        "test": "node test/boilerplate/test-karma.js"
+        "build": "ENVIRONMENT=production rollup --config rollup.config.js",
+        "build:test": "ENVIRONMENT=production rollup --config rollup.test.config.js",
+        "lint": "eslint src/ test/src/",
+        "lint:fix": "eslint src/ test/src/ --fix",
+        "test": "npm run build && npm run build:test && DEBUG=false karma start test/karma.config.js",
+        "test:debug": "npm run build && npm run build:test && DEBUG=true karma start test/karma.config.js",
+        "watch": "ENVIRONMENT=production rollup --config rollup.config.js -w"
     },
     "devDependencies": {
+        "@semantic-release/changelog": "^5.0.1",
+        "@semantic-release/exec": "^5.0.0",
+        "@semantic-release/git": "^9.0.0",
         "chai": "^4.2.0",
+        "eslint": "^7.25.0",
+        "eslint-config-prettier": "8.3.0",
+        "eslint-plugin-prettier": "3.4.1",
         "karma": "^5.1.0",
         "karma-chai": "^0.1.0",
         "karma-chrome-launcher": "^3.1.0",
@@ -32,6 +42,9 @@
     "dependencies": {
         "isobject": "^4.0.0",
         "@mparticle/web-sdk": "^2.11.1"
+    },
+    "publishConfig": {
+        "access": "public"
     },
     "license": "Apache-2.0"
 }

@@ -9,8 +9,8 @@
 
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../node_modules/should/should.js"></script>
-    <script src="../node_modules/blanket/dist/mocha/blanket_mocha.js"></script>
-    <script src="mockhttprequest.js"></script>
+    <script src="./lib/mockhttprequest.js"></script>
+    <script src="../node_modules/@mparticle/web-sdk/dist/mparticle.js"></script>
     <script>
         var mp = function () {
             var self = this;
@@ -22,11 +22,11 @@
 
         window.mParticle = new mp();
     </script>
-    <script src="../BingAdsEventForwarder.js" data-cover></script>
+    <script src="../dist/BingAdsEventForwarder.iife.js" data-cover></script>
 
     <script>mocha.setup('bdd')</script>
 
-    <script src="tests.js"></script>
+    <script src="./src/tests.js"></script>
     <script>
     mocha.run();
     </script>
