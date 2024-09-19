@@ -16,7 +16,8 @@
         "before": true,
         "beforeEach": true,
         "after": true,
-        "uetq": true
+        "uetq": true,
+        "UET": true
     },
     "extends": ["plugin:prettier/recommended", "eslint:recommended"],
     "plugins": ["prettier"],
