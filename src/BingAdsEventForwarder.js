@@ -27,17 +27,51 @@ var MessageType = {
     Commerce: 16,
 };
 
+var bingConsentValues = { Denied: 'denied', Granted: 'granted' };
+var bingConsentProperties = ['ad_storage'];
+var bingToMpConsentSettingsMapping = {
+    ad_storage: 'defaultAdStorageConsentSDK',
+};
+
 var constructor = function() {
     var self = this;
     var isInitialized = false;
     var forwarderSettings = null;
     var reportingService = null;
 
+    self.consentMappings = [];
+    self.consentPayloadAsString = '';
+    self.consentPayloadDefaults = {};
+
     self.name = name;
 
     function initForwarder(settings, service, testMode) {
+        console.warn('BING Local DEV');
+
         forwarderSettings = settings;
         reportingService = service;
+
+        if (forwarderSettings.consentMapingWeb) {
+            self.consentMappings = parseSettingsString(
+                forwarderSettings.consentMapingWeb
+            );
+        }
+        self.consentPayloadDefaults = getConsentSettings(forwarderSettings);
+
+        var initialConsentPayload = cloneObject(self.consentPayloadDefaults);
+        var userConsentState = getUserConsentState();
+
+        var updatedConsentPayload = generateConsentPayload(
+            userConsentState,
+            self.consentMappings
+        );
+
+        var consentPayload;
+        if (!isEmpty(initialConsentPayload)) {
+            consentPayload = initialConsentPayload;
+        } else if (!isEmpty(updatedConsentPayload)) {
+            consentPayload = updatedConsentPayload;
+        }
 
         try {
             if (!testMode) {
@@ -47,6 +81,7 @@ var constructor = function() {
                     var i;
                     (window[queue] = window[queue] || []),
                         (window.uetq = window.uetq || []),
+                        sendConsentDefaultToBing(consentPayload),
                         (f = function() {
                             var obj = {
                                 ti: forwarderSettings.tagId,
@@ -54,7 +89,8 @@ var constructor = function() {
                             };
                             (obj.q = window[queue]),
                                 (window[queue] = new UET(obj)),
-                                window[queue].push('pageLoad');
+                                maybeSendConsentUpdateToBing(consentPayload);
+                            window[queue].push('pageLoad');
                         }),
                         (n = document.createElement(tag)),
                         (n.src = url),
@@ -86,6 +122,7 @@ var constructor = function() {
             isInitialized = true;
             return 'Successfully initialized: ' + name;
         } catch (e) {
+            console.log('error?');
             return "Can't initialize forwarder: " + name + ': ' + e;
         }
     }
@@ -128,9 +165,12 @@ var constructor = function() {
                 "Can't log event on forwarder: " + name + ', not initialized'
             );
         }
-
         try {
             var obj = createUetObject(event, 'pageLoad');
+
+            var eventConsentState = getEventConsentState(event.ConsentState);
+
+            maybeSendConsentUpdateToBing(eventConsentState);
 
             window.uetq.push(obj);
         } catch (e) {
@@ -180,9 +220,124 @@ var constructor = function() {
         return obj;
     }
 
+    function getEventConsentState(eventConsentState) {
+        return eventConsentState && eventConsentState.getGDPRConsentState
+            ? eventConsentState.getGDPRConsentState()
+            : {};
+    }
+
+    function generateConsentPayload(consentState, mappings) {
+        if (!mappings) {
+            return {};
+        }
+
+        var payload = cloneObject(self.consentPayloadDefaults);
+        if (mappings && mappings.length > 0) {
+            for (var i = 0; i < mappings.length; i++) {
+                var mappingEntry = mappings[i];
+                var mpMappedConsentName = mappingEntry.map.toLowerCase();
+                var bingMappedConsentName = mappingEntry.value;
+
+                if (
+                    consentState[mpMappedConsentName] &&
+                    bingConsentProperties.indexOf(bingMappedConsentName) !== -1
+                ) {
+                    payload[bingMappedConsentName] = consentState[
+                        mpMappedConsentName
+                    ].Consented
+                        ? bingConsentValues.Granted
+                        : bingConsentValues.Denied;
+                }
+            }
+        }
+
+        return payload;
+    }
+
+    function maybeSendConsentUpdateToBing(consentState) {
+        // If consent payload is empty,
+        // we never sent an initial default consent state
+        // so we shouldn't send an update.
+        if (
+            self.consentPayloadAsString &&
+            self.consentMappings &&
+            !isEmpty(consentState)
+        ) {
+            var updatedConsentPayload = generateConsentPayload(
+                consentState,
+                self.consentMappings
+            );
+
+            var eventConsentAsString = JSON.stringify(updatedConsentPayload);
+
+            if (eventConsentAsString !== self.consentPayloadAsString) {
+                window.uetq.push('consent', 'update', updatedConsentPayload);
+                self.consentPayloadAsString = JSON.stringify(
+                    updatedConsentPayload
+                );
+            }
+        }
+    }
+
+    function sendConsentDefaultToBing(consentPayload) {
+        self.consentPayloadAsString = JSON.stringify(consentPayload);
+
+        window.uetq.push('consent', 'default', consentPayload);
+    }
+
     this.init = initForwarder;
     this.process = processEvent;
 };
+
+function getUserConsentState() {
+    var userConsentState = {};
+
+    if (mParticle.Identity && mParticle.Identity.getCurrentUser) {
+        var currentUser = mParticle.Identity.getCurrentUser();
+
+        if (!currentUser) {
+            return {};
+        }
+
+        var consentState = mParticle.Identity.getCurrentUser().getConsentState();
+
+        if (consentState && consentState.getGDPRConsentState) {
+            userConsentState = consentState.getGDPRConsentState();
+        }
+    }
+
+    return userConsentState;
+}
+
+function getConsentSettings(settings) {
+    var consentSettings = {};
+
+    Object.keys(bingToMpConsentSettingsMapping).forEach(function(
+        bingConsentKey
+    ) {
+        var mpConsentSettingKey =
+            bingToMpConsentSettingsMapping[bingConsentKey];
+        var bingConsentValuesKey = settings[mpConsentSettingKey];
+
+        // Microsoft recommends that for most countries, we should default to 'Granted'
+        // if a default value is not provided
+        if (bingConsentValuesKey && mpConsentSettingKey) {
+            consentSettings[bingConsentKey] = bingConsentValues[
+                bingConsentValuesKey
+            ]
+                ? bingConsentValues[bingConsentValuesKey]
+                : bingConsentValues.Granted;
+        } else {
+            consentSettings[bingConsentKey] = bingConsentValues.Granted;
+        }
+    });
+
+    return consentSettings;
+}
+
+function parseSettingsString(settingsString) {
+    return JSON.parse(settingsString.replace(/&quot;/g, '"'));
+}
 
 function getId() {
     return moduleId;
@@ -226,6 +381,14 @@ if (typeof window !== 'undefined') {
             getId: getId,
         });
     }
+}
+
+function isEmpty(value) {
+    return value == null || !(Object.keys(value) || value).length;
+}
+
+function cloneObject(obj) {
+    return JSON.parse(JSON.stringify(obj));
 }
 
 module.exports = {

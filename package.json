@@ -16,7 +16,9 @@
         "lint:fix": "eslint src/ test/src/ --fix",
         "test": "npm run build && npm run build:test && DEBUG=false karma start test/karma.config.js",
         "test:debug": "npm run build && npm run build:test && DEBUG=true karma start test/karma.config.js",
-        "watch": "ENVIRONMENT=production rollup --config rollup.config.js -w"
+        "watch": "ENVIRONMENT=production rollup --config rollup.config.js -w",
+        "watch:tests": "ENVIRONMENT=production rollup --config rollup.test.config.js -w"
+        
     },
     "devDependencies": {
         "@semantic-release/changelog": "^5.0.1",
