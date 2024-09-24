@@ -63,7 +63,6 @@ describe('Bing Ads Event Forwarder', function () {
     beforeEach(function () {
         reportService.reset();
         window.uetq = [];
-
     });
 
     describe('Init the BingAds SDK', function () {
@@ -89,7 +88,7 @@ describe('Bing Ads Event Forwarder', function () {
                     tagId: 'tagId',
                 },
                 reportService.cb,
-                false, // Disable testMode so we can test init
+                false // Disable testMode so we can test init
             );
 
             // UETQ queues up events as array elements and then parses them internally.
@@ -200,7 +199,7 @@ describe('Bing Ads Event Forwarder', function () {
                     tagId: 'tagId',
                 },
                 reportService.cb,
-                false, // Disable testMode so we can test init
+                false // Disable testMode so we can test init
             );
 
             var obj = {
@@ -271,12 +270,16 @@ describe('Bing Ads Event Forwarder', function () {
             // UETQ queues up events as array elements and then parses them internally.
             // The first 3 elements of this array will be the consent payload
             window.uetq.length.should.eql(3);
-            window.uetq.should.eql(['consent', 'default', expectedConsentPayload[2]]);
+            window.uetq.should.eql([
+                'consent',
+                'default',
+                expectedConsentPayload[2],
+            ]);
 
             done();
         });
 
-        it('should construct a Default Consent State Payload from Default Settings and construct an Update Consent State Payload from Mappings', (done) => {
+        it('should construct a Default Consent State Payload from Default Settings and construct an Update Consent State Payload from Mappings', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -293,7 +296,6 @@ describe('Bing Ads Event Forwarder', function () {
                 { ad_storage: 'denied' },
             ];
 
-
             var expectedUpdatedConsentPayload = [
                 'consent',
                 'update',
@@ -304,7 +306,6 @@ describe('Bing Ads Event Forwarder', function () {
             window.uetq[0].should.equal('consent');
             window.uetq[1].should.equal('default');
             window.uetq[2].should.eql(expectedInitialConsentPayload[2]);
-
 
             var obj = {
                 EventDataType: MessageType.PageEvent,
@@ -352,7 +353,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should ignore Unspecified Consent Settings if NOT explicitly defined in Consent State', (done) => {
+        it('should ignore Unspecified Consent Settings if NOT explicitly defined in Consent State', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -378,7 +379,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Consent State Update Payload when consent changes', (done) => {
+        it('should construct a Consent State Update Payload when consent changes', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -454,7 +455,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Consent State Update Payload with Consent Setting Defaults when consent changes', (done) => {
+        it('should construct a Consent State Update Payload with Consent Setting Defaults when consent changes', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -531,8 +532,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should NOT construct a Consent State Update Payload if consent DOES NOT change', (done) => {
-
+        it('should NOT construct a Consent State Update Payload if consent DOES NOT change', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -610,8 +610,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should create a Consent State Default of Granted if consent mappings and settings are undefined', (done) => {
-
+        it('should create a Consent State Default of Granted if consent mappings and settings are undefined', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -682,8 +681,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct Consent State Payloads if consent mappings is undefined but settings defaults are defined', (done) => {
-
+        it('should construct Consent State Payloads if consent mappings is undefined but settings defaults are defined', function (done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
