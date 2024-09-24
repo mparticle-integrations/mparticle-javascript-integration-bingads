@@ -321,6 +321,7 @@ function getConsentSettings(settings) {
 
         // Microsoft recommends that for most countries, we should default to 'Granted'
         // if a default value is not provided
+        // https://help.ads.microsoft.com/apex/index/3/en/60119
         if (bingConsentValuesKey && mpConsentSettingKey) {
             consentSettings[bingConsentKey] = bingConsentValues[
                 bingConsentValuesKey
