@@ -284,7 +284,7 @@ describe('Bing Ads Event Forwarder', function() {
                 {
                     tagId: 'tagId',
                     consentMapingWeb: JSON.stringify(consentMap),
-                    defaultAdStorageConsentSDK: 'Denied', // Should be overridden by user consent state
+                    defaultAdStorageConsentWeb: 'Denied', // Should be overridden by user consent state
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init
@@ -358,7 +358,7 @@ describe('Bing Ads Event Forwarder', function() {
                 {
                     tagId: 'tagId',
                     consentMapingWeb: JSON.stringify(consentMap),
-                    defaultAdStorageConsentSDK: 'Unspecified', // Should be overridden by user consent state
+                    defaultAdStorageConsentWeb: 'Unspecified', // Should be overridden by user consent state
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init
@@ -460,7 +460,7 @@ describe('Bing Ads Event Forwarder', function() {
                 {
                     tagId: 'tagId',
                     consentMapingWeb: JSON.stringify(consentMap),
-                    defaultAdStorageConsentSDK: 'Denied',
+                    defaultAdStorageConsentWeb: 'Denied',
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init
@@ -679,7 +679,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    defaultAdStorageConsentSDK: 'Denied',
+                    defaultAdStorageConsentWeb: 'Denied',
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init

@@ -30,7 +30,7 @@ var MessageType = {
 var bingConsentValues = { Denied: 'denied', Granted: 'granted' };
 var bingConsentProperties = ['ad_storage'];
 var bingToMpConsentSettingsMapping = {
-    ad_storage: 'defaultAdStorageConsentSDK',
+    ad_storage: 'defaultAdStorageConsentWeb',
 };
 
 var constructor = function() {
