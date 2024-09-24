@@ -1,15 +1,15 @@
-describe('Bing Ads Event Forwarder', function () {
-    var ReportingService = function () {
+describe('Bing Ads Event Forwarder', function() {
+    var ReportingService = function() {
         var self = this;
         this.id = null;
         this.event = null;
 
-        this.cb = function (forwarder, event) {
+        this.cb = function(forwarder, event) {
             self.id = forwarder.id;
             self.event = event;
         };
 
-        this.reset = function () {
+        this.reset = function() {
             self.id = null;
             self.event = null;
         };
@@ -32,7 +32,7 @@ describe('Bing Ads Event Forwarder', function () {
         Social: 7,
         Other: 8,
         Media: 9,
-        getName: function () {
+        getName: function() {
             return 'This is my name!';
         },
     };
@@ -48,25 +48,25 @@ describe('Bing Ads Event Forwarder', function () {
         Refund: 8,
         AddToWishlist: 9,
         RemoveFromWishlist: 10,
-        getName: function () {
+        getName: function() {
             return 'Action';
         },
     };
     var reportService = new ReportingService();
 
-    before(function () {
+    before(function() {
         mParticle.EventType = EventType;
         mParticle.MessageType = MessageType;
         mParticle.ProductActionType = ProductActionType;
     });
 
-    beforeEach(function () {
+    beforeEach(function() {
         reportService.reset();
         window.uetq = [];
     });
 
-    describe('Init the BingAds SDK', function () {
-        beforeEach(function () {
+    describe('Init the BingAds SDK', function() {
+        beforeEach(function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -76,13 +76,13 @@ describe('Bing Ads Event Forwarder', function () {
             );
         });
 
-        it('should init', function (done) {
+        it('should init', function(done) {
             window.uetq.length.should.equal(0);
 
             done();
         });
 
-        it('should init with a consent payload', function (done) {
+        it('should init with a consent payload', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -105,8 +105,8 @@ describe('Bing Ads Event Forwarder', function () {
         });
     });
 
-    describe('Track Events', function () {
-        beforeEach(function () {
+    describe('Track Events', function() {
+        beforeEach(function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -116,7 +116,7 @@ describe('Bing Ads Event Forwarder', function () {
             );
         });
 
-        it('should log events', function (done) {
+        it('should log events', function(done) {
             var obj = {
                 EventDataType: MessageType.PageEvent,
                 EventName: 'Test Page Event',
@@ -134,7 +134,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should log commerce events', function (done) {
+        it('should log commerce events', function(done) {
             var obj = {
                 EventDataType: MessageType.Commerce,
                 EventName: 'Test Commerce Event',
@@ -154,7 +154,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should not log event without an event name', function (done) {
+        it('should not log event without an event name', function(done) {
             mParticle.forwarder.process({
                 EventDataType: '',
             });
@@ -164,7 +164,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should not log incorrect events', function (done) {
+        it('should not log incorrect events', function(done) {
             mParticle.forwarder.process({
                 EventDataType: MessageType.Commerce,
             });
@@ -175,7 +175,7 @@ describe('Bing Ads Event Forwarder', function () {
         });
     });
 
-    describe('Consent', function () {
+    describe('Consent', function() {
         var consentMap = [
             {
                 jsmap: null,
@@ -185,15 +185,15 @@ describe('Bing Ads Event Forwarder', function () {
             },
         ];
 
-        beforeEach(function () {
+        beforeEach(function() {
             mParticle.forwarders = [];
         });
 
-        afterEach(function () {
+        afterEach(function() {
             window.uetq = [];
         });
 
-        it('should consolidate consent information', function (done) {
+        it('should consolidate consent information', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -209,7 +209,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             some_consent: {
                                 Consented: true,
@@ -250,7 +250,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Default Consent State Payload from Mappings on init', function (done) {
+        it('should construct a Default Consent State Payload from Mappings on init', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -279,7 +279,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Default Consent State Payload from Default Settings and construct an Update Consent State Payload from Mappings', function (done) {
+        it('should construct a Default Consent State Payload from Default Settings and construct an Update Consent State Payload from Mappings', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -314,7 +314,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: true,
@@ -326,7 +326,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
@@ -353,7 +353,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should ignore Unspecified Consent Settings if NOT explicitly defined in Consent State', function (done) {
+        it('should ignore Unspecified Consent Settings if NOT explicitly defined in Consent State', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -379,7 +379,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Consent State Update Payload when consent changes', function (done) {
+        it('should construct a Consent State Update Payload when consent changes', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -416,7 +416,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: false,
@@ -428,7 +428,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
@@ -455,7 +455,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct a Consent State Update Payload with Consent Setting Defaults when consent changes', function (done) {
+        it('should construct a Consent State Update Payload with Consent Setting Defaults when consent changes', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -493,7 +493,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: true,
@@ -505,7 +505,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
@@ -532,7 +532,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should NOT construct a Consent State Update Payload if consent DOES NOT change', function (done) {
+        it('should NOT construct a Consent State Update Payload if consent DOES NOT change', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -548,12 +548,6 @@ describe('Bing Ads Event Forwarder', function () {
                 { ad_storage: 'granted' },
             ];
 
-            var expectedUpdatedConsentPayload = [
-                'consent',
-                'update',
-                { ad_storage: 'denied' },
-            ];
-
             // UETQ queues up events as array elements and then parses them internally.
             // The first 3 elements of this array will be the consent payload
 
@@ -569,7 +563,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: true,
@@ -581,7 +575,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
@@ -610,7 +604,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should create a Consent State Default of Granted if consent mappings and settings are undefined', function (done) {
+        it('should create a Consent State Default of Granted if consent mappings and settings are undefined', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -640,7 +634,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: true,
@@ -652,7 +646,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
@@ -681,7 +675,7 @@ describe('Bing Ads Event Forwarder', function () {
             done();
         });
 
-        it('should construct Consent State Payloads if consent mappings is undefined but settings defaults are defined', function (done) {
+        it('should construct Consent State Payloads if consent mappings is undefined but settings defaults are defined', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -712,7 +706,7 @@ describe('Bing Ads Event Forwarder', function () {
                     'Bing.EventValue': 10,
                 },
                 ConsentState: {
-                    getGDPRConsentState: function () {
+                    getGDPRConsentState: function() {
                         return {
                             marketing_consent: {
                                 Consented: false,
@@ -724,7 +718,7 @@ describe('Bing Ads Event Forwarder', function () {
                         };
                     },
 
-                    getCCPAConsentState: function () {
+                    getCCPAConsentState: function() {
                         return {
                             data_sale_opt_out: {
                                 Consented: false,
