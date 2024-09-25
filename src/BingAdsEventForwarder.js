@@ -87,7 +87,9 @@ var constructor = function() {
                             };
                             (obj.q = window[queue]),
                                 (window[queue] = new UET(obj)),
-                                maybeSendConsentUpdateToBing(updatedConsentPayload);
+                                maybeSendConsentUpdateToBing(
+                                    updatedConsentPayload
+                                );
                             window[queue].push('pageLoad');
                         }),
                         (n = document.createElement(tag)),
