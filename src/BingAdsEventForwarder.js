@@ -46,14 +46,12 @@ var constructor = function() {
     self.name = name;
 
     function initForwarder(settings, service, testMode) {
-        console.warn('BING Local DEV');
-
         forwarderSettings = settings;
         reportingService = service;
 
-        if (forwarderSettings.consentMapingWeb) {
+        if (forwarderSettings.consentMappingWeb) {
             self.consentMappings = parseSettingsString(
-                forwarderSettings.consentMapingWeb
+                forwarderSettings.consentMappingWeb
             );
         }
         self.consentPayloadDefaults = getConsentSettings(forwarderSettings);
@@ -89,7 +87,7 @@ var constructor = function() {
                             };
                             (obj.q = window[queue]),
                                 (window[queue] = new UET(obj)),
-                                maybeSendConsentUpdateToBing(consentPayload);
+                                maybeSendConsentUpdateToBing(updatedConsentPayload);
                             window[queue].push('pageLoad');
                         }),
                         (n = document.createElement(tag)),
@@ -122,7 +120,6 @@ var constructor = function() {
             isInitialized = true;
             return 'Successfully initialized: ' + name;
         } catch (e) {
-            console.log('error?');
             return "Can't initialize forwarder: " + name + ': ' + e;
         }
     }

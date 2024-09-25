@@ -254,7 +254,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb:
+                    consentMappingWeb:
                         '[{&quot;jsmap&quot;:null,&quot;map&quot;:&quot;Marketing&quot;,&quot;maptype&quot;:&quot;ConsentPurposes&quot;,&quot;value&quot;:&quot;ad_storage&quot;}]',
                 },
                 reportService.cb,
@@ -283,7 +283,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb: JSON.stringify(consentMap),
+                    consentMappingWeb: JSON.stringify(consentMap),
                     defaultAdStorageConsentWeb: 'Denied', // Should be overridden by user consent state
                 },
                 reportService.cb,
@@ -357,7 +357,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb: JSON.stringify(consentMap),
+                    consentMappingWeb: JSON.stringify(consentMap),
                     defaultAdStorageConsentWeb: 'Unspecified', // Should be overridden by user consent state
                 },
                 reportService.cb,
@@ -383,7 +383,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb: JSON.stringify(consentMap),
+                    consentMappingWeb: JSON.stringify(consentMap),
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init
@@ -459,7 +459,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb: JSON.stringify(consentMap),
+                    consentMappingWeb: JSON.stringify(consentMap),
                     defaultAdStorageConsentWeb: 'Denied',
                 },
                 reportService.cb,
@@ -536,7 +536,7 @@ describe('Bing Ads Event Forwarder', function() {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
-                    consentMapingWeb: JSON.stringify(consentMap),
+                    consentMappingWeb: JSON.stringify(consentMap),
                 },
                 reportService.cb,
                 false // Disable testMode so we can test init
