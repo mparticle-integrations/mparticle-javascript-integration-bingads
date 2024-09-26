@@ -589,6 +589,7 @@ describe('Bing Ads Event Forwarder', function() {
                 el: 'Test Page Event',
                 ev: 10,
             });
+            window.uetq.indexOf('update').should.equal(-1);
 
             done();
         });
