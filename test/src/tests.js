@@ -370,8 +370,6 @@ describe('Bing Ads Event Forwarder', function() {
                 { ad_storage: 'granted' },
             ];
 
-            console.log('uetq', window.uetq);
-
             window.uetq.length.should.eql(3);
             window.uetq[0].should.equal('consent');
             window.uetq[1].should.equal('default');

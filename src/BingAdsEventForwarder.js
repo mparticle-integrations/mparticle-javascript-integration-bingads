@@ -64,13 +64,6 @@ var constructor = function() {
             self.consentMappings
         );
 
-        var consentPayload;
-        if (!isEmpty(initialConsentPayload)) {
-            consentPayload = initialConsentPayload;
-        } else if (!isEmpty(updatedConsentPayload)) {
-            consentPayload = updatedConsentPayload;
-        }
-
         try {
             if (!testMode) {
                 (function(window, document, tag, url, queue) {
@@ -79,7 +72,7 @@ var constructor = function() {
                     var i;
                     (window[queue] = window[queue] || []),
                         (window.uetq = window.uetq || []),
-                        sendConsentDefaultToBing(consentPayload),
+                        sendConsentDefaultToBing(initialConsentPayload),
                         (f = function() {
                             var obj = {
                                 ti: forwarderSettings.tagId,
@@ -254,9 +247,6 @@ var constructor = function() {
     }
 
     function maybeSendConsentUpdateToBing(consentState) {
-        // If consent payload is empty,
-        // we never sent an initial default consent state
-        // so we shouldn't send an update.
         if (
             self.consentPayloadAsString &&
             self.consentMappings &&
