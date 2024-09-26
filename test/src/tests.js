@@ -93,7 +93,6 @@ describe('Bing Ads Event Forwarder', function() {
 
             // UETQ queues up events as array elements and then parses them internally.
             // The first 3 elements of this array will be the consent payload
-            // The 4th element will be the event payload
             window.uetq.length.should.eql(3);
             window.uetq[0].should.equal('consent');
             window.uetq[1].should.equal('default');
@@ -193,7 +192,7 @@ describe('Bing Ads Event Forwarder', function() {
             window.uetq = [];
         });
 
-        it('should consolidate consent information', function(done) {
+        it('should consent information to window.uetq', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -250,7 +249,7 @@ describe('Bing Ads Event Forwarder', function() {
             done();
         });
 
-        it('should construct a Default Consent State Payload from Mappings on init', function(done) {
+        it('should construct a Default Consent State Payload of `granted` from Mappings when `defaultAdStorageConsentWeb` is undefined', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -270,11 +269,7 @@ describe('Bing Ads Event Forwarder', function() {
             // UETQ queues up events as array elements and then parses them internally.
             // The first 3 elements of this array will be the consent payload
             window.uetq.length.should.eql(3);
-            window.uetq.should.eql([
-                'consent',
-                'default',
-                expectedConsentPayload[2],
-            ]);
+            window.uetq.should.eql(expectedConsentPayload);
 
             done();
         });
@@ -303,9 +298,7 @@ describe('Bing Ads Event Forwarder', function() {
             ];
 
             window.uetq.length.should.eql(3);
-            window.uetq[0].should.equal('consent');
-            window.uetq[1].should.equal('default');
-            window.uetq[2].should.eql(expectedInitialConsentPayload[2]);
+            window.uetq.should.eql(expectedInitialConsentPayload);
 
             var obj = {
                 EventDataType: MessageType.PageEvent,
@@ -371,13 +364,11 @@ describe('Bing Ads Event Forwarder', function() {
             ];
 
             window.uetq.length.should.eql(3);
-            window.uetq[0].should.equal('consent');
-            window.uetq[1].should.equal('default');
-            window.uetq[2].should.eql(expectedConsentPayload[2]);
+            window.uetq.should.eql(expectedConsentPayload);
             done();
         });
 
-        it('should construct a Consent State Update Payload when consent changes', function(done) {
+        it('should construct a Consent State Update Payload when consent changes and defaultAdStorageConsentWeb is undefined', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -453,7 +444,7 @@ describe('Bing Ads Event Forwarder', function() {
             done();
         });
 
-        it('should construct a Consent State Update Payload with Consent Setting Defaults when consent changes', function(done) {
+        it('should construct a Consent State Update Payload when consent changes', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
@@ -587,7 +578,7 @@ describe('Bing Ads Event Forwarder', function() {
 
             mParticle.forwarder.process(obj);
 
-            // UETQ should now have 7 elements
+            // UETQ should now have 4 elements
             // The first 3 elements of this array will be the initial consent payload
             // The 4th element will be the event payload
 
@@ -624,51 +615,6 @@ describe('Bing Ads Event Forwarder', function() {
             window.uetq[0].should.equal('consent');
             window.uetq[1].should.equal('default');
             window.uetq[2].should.eql(expectedInitialConsentPayload[2]);
-
-            var obj = {
-                EventDataType: MessageType.PageEvent,
-                EventName: 'Test Page Event',
-                CustomFlags: {
-                    'Bing.EventValue': 10,
-                },
-                ConsentState: {
-                    getGDPRConsentState: function() {
-                        return {
-                            marketing_consent: {
-                                Consented: true,
-                                Timestamp: 1557935884509,
-                                ConsentDocument: 'Marketing_Consent',
-                                Location: 'This is fake',
-                                HardwareId: '123456',
-                            },
-                        };
-                    },
-
-                    getCCPAConsentState: function() {
-                        return {
-                            data_sale_opt_out: {
-                                Consented: false,
-                                Timestamp: Date.now(),
-                                Document: 'some_consent',
-                            },
-                        };
-                    },
-                },
-            };
-
-            mParticle.forwarder.process(obj);
-
-            // UETQ should now have 7 elements
-            // The first 3 elements of this array will be the initial consent payload
-            // The 4th element will be the event payload
-
-            window.uetq.length.should.eql(4);
-            window.uetq[3].should.eql({
-                ea: 'pageLoad',
-                ec: 'This is my name!',
-                el: 'Test Page Event',
-                ev: 10,
-            });
 
             done();
         });
@@ -730,7 +676,7 @@ describe('Bing Ads Event Forwarder', function() {
 
             mParticle.forwarder.process(obj);
 
-            // UETQ should now have 7 elements
+            // UETQ should now have 4 elements
             // The first 3 elements of this array will be the initial consent payload
             // The 4th element will be the event payload
 
