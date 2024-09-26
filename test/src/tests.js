@@ -346,7 +346,7 @@ describe('Bing Ads Event Forwarder', function() {
             done();
         });
 
-        it('should ignore Unspecified Consent Settings if NOT explicitly defined in Consent State', function(done) {
+        it('should default to `granted` if Consent Settings are `Unspecified`', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
