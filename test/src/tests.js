@@ -619,7 +619,7 @@ describe('Bing Ads Event Forwarder', function() {
             done();
         });
 
-        it('should construct Consent State Payloads if consent mappings is undefined but settings defaults are defined', function(done) {
+        it('should ONLY construct Default Consent State Payloads if consent mappings is undefined but settings defaults are defined and consent does not change', function(done) {
             mParticle.forwarder.init(
                 {
                     tagId: 'tagId',
